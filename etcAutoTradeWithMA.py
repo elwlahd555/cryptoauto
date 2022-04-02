@@ -1,16 +1,9 @@
 import time
 import pyupbit
 import datetime
-import schedule
-from fbprophet import Prophet
 
 access = "your-access"
 secret = "your-secret"
-
-etc="ETC"
-etcFull = "KRW-ETC"
-btc="btc"
-btcFull = "KRW-BTC"
 
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
@@ -23,6 +16,12 @@ def get_start_time(ticker):
     df = pyupbit.get_ohlcv(ticker, interval="day", count=1)
     start_time = df.index[0]
     return start_time
+
+def get_ma15(ticker):
+    """15일 이동 평균선 조회"""
+    df = pyupbit.get_ohlcv(ticker, interval="day", count=15)
+    ma15 = df['close'].rolling(15).mean().iloc[-1]
+    return ma15
 
 def get_balance(ticker):
     """잔고 조회"""
@@ -39,27 +38,6 @@ def get_current_price(ticker):
     """현재가 조회"""
     return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
 
-predicted_close_price = 0
-def predict_price(ticker):
-    """Prophet으로 당일 종가 가격 예측"""
-    global predicted_close_price
-    df = pyupbit.get_ohlcv(ticker, interval="minute60")
-    df = df.reset_index()
-    df['ds'] = df['index']
-    df['y'] = df['close']
-    data = df[['ds','y']]
-    model = Prophet()
-    model.fit(data)
-    future = model.make_future_dataframe(periods=24, freq='H')
-    forecast = model.predict(future)
-    closeDf = forecast[forecast['ds'] == forecast.iloc[-1]['ds'].replace(hour=9)]
-    if len(closeDf) == 0:
-        closeDf = forecast[forecast['ds'] == data.iloc[-1]['ds'].replace(hour=9)]
-    closeValue = closeDf['yhat'].values[0]
-    predicted_close_price = closeValue
-predict_price(btcFull)
-schedule.every().hour.do(lambda: predict_price(btcFull))
-
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
 print("autotrade start")
@@ -68,23 +46,22 @@ print("autotrade start")
 while True:
     try:
         now = datetime.datetime.now()
-        start_time = get_start_time(btcFull)
+        start_time = get_start_time("KRW-ETC")
         end_time = start_time + datetime.timedelta(days=1)
-        schedule.run_pending()
 
         if start_time < now < end_time - datetime.timedelta(seconds=10):
-            target_price = get_target_price(btcFull, 0.5)
-            current_price = get_current_price(btcFull)
-            if target_price < current_price and current_price < predicted_close_price:
+            target_price = get_target_price("KRW-ETC", 0.7)
+            ma15 = get_ma15("KRW-ETC")
+            current_price = get_current_price("KRW-ETC")
+            if target_price < current_price and ma15 < current_price:
                 krw = get_balance("KRW")
                 if krw > 5000:
-                    upbit.buy_market_order(btcFull, krw*0.9995)
+                    upbit.buy_market_order("KRW-ETC", krw*0.9995)
         else:
-            btc = get_balance(btc)
-            if btc > 0.00008:
-                upbit.sell_market_order(btcFull, btc*0.9995)
+            etc = get_balance("ETC")
+            if etc > 0.00008:
+                upbit.sell_market_order("KRW-ETC", etc*0.9995)
         time.sleep(1)
     except Exception as e:
         print(e)
         time.sleep(1)
-        
