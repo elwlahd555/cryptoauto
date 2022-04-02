@@ -7,6 +7,9 @@ from fbprophet import Prophet
 access = "your-access"
 secret = "your-secret"
 
+etc="ETC"
+etcFull = "KRW-ETC"
+
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
     df = pyupbit.get_ohlcv(ticker, interval="day", count=2)
@@ -52,8 +55,8 @@ def predict_price(ticker):
         closeDf = forecast[forecast['ds'] == data.iloc[-1]['ds'].replace(hour=9)]
     closeValue = closeDf['yhat'].values[0]
     predicted_close_price = closeValue
-predict_price("KRW-BTC")
-schedule.every().hour.do(lambda: predict_price("KRW-BTC"))
+predict_price(etcFull)
+schedule.every().hour.do(lambda: predict_price(etcFull))
 
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
@@ -63,21 +66,21 @@ print("autotrade start")
 while True:
     try:
         now = datetime.datetime.now()
-        start_time = get_start_time("KRW-BTC")
+        start_time = get_start_time(etcFull)
         end_time = start_time + datetime.timedelta(days=1)
         schedule.run_pending()
 
         if start_time < now < end_time - datetime.timedelta(seconds=10):
-            target_price = get_target_price("KRW-BTC", 0.5)
-            current_price = get_current_price("KRW-BTC")
+            target_price = get_target_price(etcFull, 0.5)
+            current_price = get_current_price(etcFull)
             if target_price < current_price and current_price < predicted_close_price:
                 krw = get_balance("KRW")
                 if krw > 5000:
-                    upbit.buy_market_order("KRW-BTC", krw*0.9995)
+                    upbit.buy_market_order(etcFull, krw*0.9995)
         else:
-            btc = get_balance("BTC")
+            btc = get_balance(etc)
             if btc > 0.00008:
-                upbit.sell_market_order("KRW-BTC", btc*0.9995)
+                upbit.sell_market_order(etcFull, btc*0.9995)
         time.sleep(1)
     except Exception as e:
         print(e)
