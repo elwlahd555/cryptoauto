@@ -41,14 +41,14 @@ def get_current_price(ticker):
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
 print("autotrade start")
-Krw = 0
+krw = 0
 checkETC = 0
 checkXRP = 0
 
 # 자동매매 시작
 while True:
     try:
-        if Krw < 5000 and (checkETC == 0 or checkXRP == 0):
+        if krw < 5000 and (checkETC == 0 or checkXRP == 0):
             krw = get_balance("KRW")
         
         now = datetime.datetime.now()
@@ -89,6 +89,7 @@ while True:
                 upbit.sell_market_order("KRW-XRP", xrp)
             checkETC = 0
             checkXRP = 0
+            krw = 0
             
         time.sleep(1)
     except Exception as e:
