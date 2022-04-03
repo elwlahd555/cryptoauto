@@ -50,19 +50,33 @@ while True:
         end_time = start_time + datetime.timedelta(days=1)
 
         if start_time < now < end_time - datetime.timedelta(seconds=10):
+            krw = get_balance("KRW")
+            #ETC
             target_price = get_target_price("KRW-ETC", 0.7)
             ma15 = get_ma15("KRW-ETC")
             current_price = get_current_price("KRW-ETC")
             if target_price < current_price:
-                krw = get_balance("KRW")
                 if krw > 5000:
                     if ma15 < current_price:
-                        upbit.buy_market_order("KRW-ETC", krw*0.64)
-                    upbit.buy_market_order("KRW-ETC", krw*0.35)
+                        upbit.buy_market_order("KRW-ETC", krw*0.45)
+                    upbit.buy_market_order("KRW-ETC", krw*0.15)
+
+            target_price = get_target_price("KRW-XRP", 0.7)
+            ma15 = get_ma15("KRW-XRP")
+            current_price = get_current_price("KRW-XRP")
+            if target_price < current_price:
+                if krw > 5000:
+                    if ma15 < current_price:
+                        upbit.buy_market_order("KRW-XRP", krw*0.30)
+                    upbit.buy_market_order("KRW-XRP", krw*0.08)
         else:
             etc = get_balance("ETC")
             if etc > 0.00008:
                 upbit.sell_market_order("KRW-ETC", etc)
+                
+            xrp = get_balance("XRP")
+            if xrp > 5:
+                upbit.sell_market_order("KRW-XRP", xrp)
         time.sleep(1)
     except Exception as e:
         print(e)
