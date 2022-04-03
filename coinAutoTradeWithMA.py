@@ -2,8 +2,8 @@ import time
 import pyupbit
 import datetime
 
-access = "your-access"
-secret = "your-secret"
+access = "ETJKRExZGlRHENxulcm9ljbBPg2kemIm4S4YEBfp"
+secret = "nbqn0KNkJxdrHc54bHGIMrN0MmbKcEPdt9w3c6uo"
 
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
@@ -41,35 +41,44 @@ def get_current_price(ticker):
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
 print("autotrade start")
+Krw = 0
+checkETC = 0
+checkXRP = 0
 
 # 자동매매 시작
 while True:
     try:
+        if Krw < 5000 and (checkETC == 0 or checkXRP == 0):
+            krw = get_balance("KRW")
+        
         now = datetime.datetime.now()
         start_time = get_start_time("KRW-ETC")
         end_time = start_time + datetime.timedelta(days=1)
 
         if start_time < now < end_time - datetime.timedelta(seconds=10):
-            krw = get_balance("KRW")
             #ETC
-            target_price = get_target_price("KRW-ETC", 0.7)
-            ma15 = get_ma15("KRW-ETC")
-            current_price = get_current_price("KRW-ETC")
-            if target_price < current_price:
-                if krw > 5000:
-                    if ma15 < current_price:
-                        upbit.buy_market_order("KRW-ETC", krw*0.45)
-                    upbit.buy_market_order("KRW-ETC", krw*0.15)
+            if checkETC == 0 :
+                target_price = get_target_price("KRW-ETC", 0.7)
+                ma15 = get_ma15("KRW-ETC")
+                current_price = get_current_price("KRW-ETC")
+                if target_price < current_price:
+                    if krw > 5000:
+                        if ma15 < current_price:
+                            upbit.buy_market_order("KRW-ETC", krw*0.45)
+                        upbit.buy_market_order("KRW-ETC", krw*0.15)
+                        checkETC = 1
             
             #XRP
-            target_price = get_target_price("KRW-XRP", 0.7)
-            ma15 = get_ma15("KRW-XRP")
-            current_price = get_current_price("KRW-XRP")
-            if target_price < current_price:
-                if krw > 5000:
-                    if ma15 < current_price:
-                        upbit.buy_market_order("KRW-XRP", krw*0.30)
-                    upbit.buy_market_order("KRW-XRP", krw*0.08)
+            if checkXRP == 0 :
+                target_price = get_target_price("KRW-XRP", 0.7)
+                ma15 = get_ma15("KRW-XRP")
+                current_price = get_current_price("KRW-XRP")
+                if target_price < current_price:
+                    if krw > 5000:
+                        if ma15 < current_price:
+                            upbit.buy_market_order("KRW-XRP", krw*0.30)
+                        upbit.buy_market_order("KRW-XRP", krw*0.08)
+                        checkXRP = 1
         else:
             etc = get_balance("ETC")
             if etc > 0.1:
@@ -78,6 +87,9 @@ while True:
             xtc = get_balance("XRP")
             if xrp > 5:
                 upbit.sell_market_order("KRW-XRP", xrp)
+            checkETC = 0
+            checkXRP = 0
+            
         time.sleep(1)
     except Exception as e:
         print(e)
