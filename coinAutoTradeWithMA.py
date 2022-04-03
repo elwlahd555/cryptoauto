@@ -2,8 +2,8 @@ import time
 import pyupbit
 import datetime
 
-access = "your-access"
-secret = "your-secret"
+access = "ETJKRExZGlRHENxulcm9ljbBPg2kemIm4S4YEBfp"
+secret = "nbqn0KNkJxdrHc54bHGIMrN0MmbKcEPdt9w3c6uo"
 
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
@@ -60,7 +60,8 @@ while True:
                     if ma15 < current_price:
                         upbit.buy_market_order("KRW-ETC", krw*0.45)
                     upbit.buy_market_order("KRW-ETC", krw*0.15)
-
+            
+            #XRP
             target_price = get_target_price("KRW-XRP", 0.7)
             ma15 = get_ma15("KRW-XRP")
             current_price = get_current_price("KRW-XRP")
@@ -71,10 +72,10 @@ while True:
                     upbit.buy_market_order("KRW-XRP", krw*0.08)
         else:
             etc = get_balance("ETC")
-            if etc > 0.00008:
+            if etc > 0.1:
                 upbit.sell_market_order("KRW-ETC", etc)
                 
-            xrp = get_balance("XRP")
+            xtc = get_balance("XRP")
             if xrp > 5:
                 upbit.sell_market_order("KRW-XRP", xrp)
         time.sleep(1)
