@@ -1,13 +1,13 @@
 # cryptoauto
 
-Windows 인공지능 (Prophet) 자동매매 환경 설치 방법
+<summary>Windows 인공지능 (Prophet) 자동매매 환경 설치 방법</summary>
 아나콘다(https://www.anaconda.com/) 설치
 pip install pyupbit
 pip install schedule
 conda install -c conda-forge fbprophet
 pip install pystan --upgrade
 
-Ubuntu 20.4 인공지능 (Prophet) 자동매매 환경 설치 방법
+<summary>Ubuntu 20.4 인공지능 (Prophet) 자동매매 환경 설치 방법</summary>
 4GB이상 RAM 필요 (AWS t2.medium 이상)
 sudo apt update
 sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
@@ -18,7 +18,7 @@ pip3 install pystan==2.19.1.1
 pip3 install convertdate
 pip3 install fbprophet
 
-Ubuntu 서버 명령어
+<summary>Ubuntu 서버 명령어</summary>
 (\*추가)한국 기준으로 서버 시간 설정: sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 현재 경로 상세 출력: ls -al
 경로 이동: cd 경로
