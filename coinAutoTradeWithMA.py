@@ -48,7 +48,7 @@ checkXRP = 0
 # 자동매매 시작
 while True:
     try:
-        if krw < 5000 and (checkETC == 0 or checkXRP == 0):
+        if checkETC == 0 and checkXRP == 0:
             krw = get_balance("KRW")
         
         now = datetime.datetime.now()
@@ -87,6 +87,7 @@ while True:
             xrp = get_balance("XRP")
             if xrp > 5:
                 upbit.sell_market_order("KRW-XRP", xrp)
+            
             checkETC = 0
             checkXRP = 0
             krw = 0
