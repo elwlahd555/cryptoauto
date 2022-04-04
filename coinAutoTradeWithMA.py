@@ -84,7 +84,7 @@ while True:
             if etc > 0.1:
                 upbit.sell_market_order("KRW-ETC", etc)
                 
-            xtc = get_balance("XRP")
+            xrp = get_balance("XRP")
             if xrp > 5:
                 upbit.sell_market_order("KRW-XRP", xrp)
             checkETC = 0
