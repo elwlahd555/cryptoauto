@@ -44,6 +44,7 @@ print("autotrade start")
 krw = 0
 checkETC = 0
 checkXRP = 0
+checkBSV = 0
 
 # 자동매매 시작
 while True:
@@ -64,9 +65,10 @@ while True:
                 if target_price < current_price:
                     if krw > 5000:
                         if ma15 < current_price:
-                            upbit.buy_market_order("KRW-ETC", krw*0.45)
-                        upbit.buy_market_order("KRW-ETC", krw*0.15)
+                            upbit.buy_market_order("KRW-ETC", krw*0.5)
+                        upbit.buy_market_order("KRW-ETC", krw*0.1)
                         checkETC = 1
+                krw=get_balance("KRW")
             
             #XRP
             if checkXRP == 0 :
@@ -76,9 +78,23 @@ while True:
                 if target_price < current_price:
                     if krw > 5000:
                         if ma15 < current_price:
-                            upbit.buy_market_order("KRW-XRP", krw*0.30)
-                        upbit.buy_market_order("KRW-XRP", krw*0.08)
+                            upbit.buy_market_order("KRW-XRP", krw*0.5)
+                        upbit.buy_market_order("KRW-XRP", krw*0.1)
                         checkXRP = 1
+                krw=get_balance("KRW")
+                        
+            #BSV
+            if checkBSV==0 and (checkXRP == 1 or checkETC==1) :
+                target_price = get_target_price("KRW-BSV", 0.7)
+                ma15 = get_ma15("KRW-BSV")
+                current_price = get_current_price("KRW-BSV")
+                if target_price < current_price:
+                    if krw > 5000:
+                        if ma15 < current_price:
+                            upbit.buy_market_order("KRW-BSV", krw*0.5)
+                        upbit.buy_market_order("KRW-BSV", krw*0.1)
+                        checkBSV = 1
+                krw=get_balance("KRW")
         else:
             etc = get_balance("ETC")
             if etc > 0.1:
@@ -87,9 +103,14 @@ while True:
             xrp = get_balance("XRP")
             if xrp > 5:
                 upbit.sell_market_order("KRW-XRP", xrp)
+                
+            bsv = get_balance("BSV")
+            if bsv > 0.1:
+                upbit.sell_market_order("KRW-BSV", bsv)
             
             checkETC = 0
             checkXRP = 0
+            checkBSV = 0
             krw = 0
             
         time.sleep(1)
